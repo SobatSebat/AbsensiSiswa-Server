@@ -1,0 +1,5 @@
+*.db
+*.db*
+test*
+__pycache__
+session.json

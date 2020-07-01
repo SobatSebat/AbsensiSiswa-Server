@@ -1,0 +1,44 @@
+PRAGMA synchronous = OFF;
+PRAGMA journal_mode = MEMORY;
+BEGIN TRANSACTION;
+CREATE TABLE `users` (
+  `id` integer PRIMARY KEY AUTOINCREMENT
+,  `username` varchar(255)
+,  `password` password
+,  `nomor_induk` varchar(255)
+,  `nama_lengkap` varchar(255)
+,  `tanggal_lahir` integer
+,  `nomor_telpon` varchar(255)
+,  `nomor_telpon_ortu` varchar(255)
+,  `alamat` varchar(255)
+,  `level` enum
+);
+CREATE TABLE `kelas` (
+  `id` integer PRIMARY KEY AUTOINCREMENT
+,  `nama` varchar(255)
+);
+CREATE TABLE `mapel` (
+  `id` integer PRIMARY KEY AUTOINCREMENT
+,  `nama` varchar(255)
+);
+CREATE TABLE `kelas_user` (
+  `id` integer PRIMARY KEY AUTOINCREMENT
+,  `user_id` integer
+,  `kelas_id` integer
+,  `create_time` integer
+);
+CREATE TABLE `mapel_user` (
+  `id` integer PRIMARY KEY AUTOINCREMENT
+,  `user_id` integer
+,  `mapel_id` integer
+,  `create_time` integer
+);
+CREATE TABLE `absen` (
+  `id` integer PRIMARY KEY AUTOINCREMENT
+,  `user_id` integer
+,  `kelas_user_id` integer
+,  `mapel_user_id` integer
+,  `waktu_hadir` integer
+,  `waktu_jadwal` integer
+);
+END TRANSACTION;
