@@ -1,59 +1,42 @@
-CREATE TABLE `users` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `username` varchar(255),
-  `password` password,
-  `nomor_induk` varchar(255),
-  `nama_lengkap` varchar(255),
-  `tanggal_lahir` int,
-  `nomor_telpon` varchar(255),
-  `nomor_telpon_ortu` varchar(255),
-  `alamat` varchar(255),
-  `level` enum
+BEGIN TRANSACTION;
+DROP TABLE IF EXISTS "absen";
+CREATE TABLE IF NOT EXISTS "absen" (
+	"id"	integer PRIMARY KEY AUTOINCREMENT,
+	"kelas_mapel_user_id"	INTEGER,
+	"waktu_hadir"	integer
 );
-
-CREATE TABLE `kelas` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `nama` varchar(255)
+DROP TABLE IF EXISTS "kelas_mapel_user";
+CREATE TABLE IF NOT EXISTS "kelas_mapel_user" (
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"user_id"	INTEGER,
+	"kelas_id"	INTEGER,
+	"mapel_id"	INTEGER,
+	FOREIGN KEY("user_id") REFERENCES "users"("id"),
+	FOREIGN KEY("kelas_id") REFERENCES "kelas"("id"),
+	FOREIGN KEY("mapel_id") REFERENCES "mapel"("id")
 );
-
-CREATE TABLE `mapel` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `nama` varchar(255)
+DROP TABLE IF EXISTS "mapel";
+CREATE TABLE IF NOT EXISTS "mapel" (
+	"id"	integer PRIMARY KEY AUTOINCREMENT,
+	"nama"	varchar(255)
 );
-
-CREATE TABLE `kelas_user` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `user_id` int,
-  `kelas_id` int,
-  `create_time` int
+DROP TABLE IF EXISTS "kelas";
+CREATE TABLE IF NOT EXISTS "kelas" (
+	"id"	integer PRIMARY KEY AUTOINCREMENT,
+	"nama"	varchar(255)
 );
-
-CREATE TABLE `mapel_user` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `user_id` int,
-  `mapel_id` int,
-  `create_time` int
+DROP TABLE IF EXISTS "users";
+CREATE TABLE IF NOT EXISTS "users" (
+	"id"	integer PRIMARY KEY AUTOINCREMENT,
+	"username"	varchar(255),
+	"password"	varchar(255),
+	"nomor_induk"	varchar(255),
+	"nama_lengkap"	varchar(255),
+	"tanggal_lahir"	integer,
+	"nomor_telpon"	varchar(255),
+	"nomor_telpon_ortu"	varchar(255),
+	"alamat"	varchar(255),
+	"level"	enum
 );
-
-CREATE TABLE `absen` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `user_id` int,
-  `kelas_user_id` int,
-  `mapel_user_id` int,
-  `waktu_hadir` int,
-  `waktu_jadwal` int
-);
-
-ALTER TABLE `kelas_user` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
-ALTER TABLE `kelas_user` ADD FOREIGN KEY (`kelas_id`) REFERENCES `kelas` (`id`);
-
-ALTER TABLE `mapel_user` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
-ALTER TABLE `mapel_user` ADD FOREIGN KEY (`mapel_id`) REFERENCES `mapel` (`id`);
-
-ALTER TABLE `absen` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
-ALTER TABLE `absen` ADD FOREIGN KEY (`kelas_user_id`) REFERENCES `kelas_user` (`id`);
-
-ALTER TABLE `absen` ADD FOREIGN KEY (`mapel_user_id`) REFERENCES `mapel_user` (`id`);
+INSERT INTO "users" ("id","username","password","nomor_induk","nama_lengkap","tanggal_lahir","nomor_telpon","nomor_telpon_ortu","alamat","level") VALUES (1,'admin','5f4dcc3b5aa765d61d8327deb882cf99',NULL,NULL,NULL,NULL,NULL,NULL,0);
+COMMIT;

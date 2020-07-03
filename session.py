@@ -6,7 +6,7 @@ import time
 _SESSION_FILE_NAME = os.path.realpath(os.path.join(os.path.dirname(__file__), "session.json"))
 if not os.path.isfile(_SESSION_FILE_NAME):
 	open(_SESSION_FILE_NAME, "w+").close()
-	
+
 _SESSION_FILE = open(_SESSION_FILE_NAME, "r+")
 if _SESSION_FILE.read() == "":
 	_SESSION_FILE.write("{}")
@@ -46,6 +46,7 @@ _SESSION = _MyDict()
 
 def Add(id, token):
 	global _SESSION
+	id = str(id)
 	old_token = _SESSION.get(id, None)
 	_SESSION[id] = token
 	_SESSION[token] = id
@@ -55,12 +56,13 @@ def Add(id, token):
 			del _SESSION[old_token]
 
 def GetID(token):
-	return _SESSION.get(token, None)
+	return int(_SESSION.get(token, 0))
 
 def GetId(token):
 	return GetID(token)
 
 def GetToken(id):
+	id = str(id)
 	return _SESSION.get(id, None)
 
 def Set(id, token):
