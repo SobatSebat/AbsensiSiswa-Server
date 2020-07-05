@@ -223,6 +223,40 @@ def _get_kmu_siswa_by_noton_kelas_id_and_mapel_id(token, kelas_id, mapel_id):
 
 	return json.dumps({"success": True, "data": kelas_mapel_user.getUserByBukanKelasMapelLevel(kelas_id, mapel_id, 2)})
 
+@app.route("/api/<token>/kmu/all/guru", methods=["GET"])
+def _get_kmu_all_guru(token):
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": kelas_mapel_user.getAllByLevel(1)})
+
+@app.route("/api/<token>/kmu/all/siswa", methods=["GET"])
+def _get_kmu_all_siswa(token):
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": kelas_mapel_user.getAllByLevel(2)})
+
+@app.route("/api/<token>/kmu/all/guru/<user_id>", methods=["GET"])
+def _get_kmu_all_guru_by_user_id(token, user_id):
+	user_id = int(user_id)
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": kelas_mapel_user.getAllByUserLevel(user_id, 1)})
+
+@app.route("/api/<token>/kmu/all/siswa/<user_id>", methods=["GET"])
+def _get_kmu_all_siswa_by_user_id(token, user_id):
+	user_id = int(user_id)
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": kelas_mapel_user.getAllByUserLevel(user_id, 2)})
+
 # create
 
 @app.route("/api/<token>/create/guru", methods=["POST"])

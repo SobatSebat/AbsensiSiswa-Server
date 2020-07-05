@@ -342,3 +342,31 @@ class Kelas_Mapel_UserTable(Table):
 			return True
 		except Exception as e:
 			return False
+
+	def getAllByLevel(self, level):
+		cursor = self.db.cursor()
+		cursor.execute("SELECT kelas_mapel_user.*, users.nama_lengkap as nama_lengkap, kelas.nama as nama_kelas, mapel.nama as nama_mapel FROM kelas_mapel_user JOIN users JOIN kelas JOIN mapel WHERE users.level = ? AND kelas_mapel_user.user_id = users.id AND kelas_mapel_user.kelas_id = kelas.id AND kelas_mapel_user.mapel_id = mapel.id ORDER BY users.id, kelas.id;", (level,))
+		row = cursor.fetchall();
+		cursor.close()
+
+		return row
+
+	def getAllByUserLevel(self, user_id, level):
+		cursor = self.db.cursor()
+		cursor.execute("SELECT kelas_mapel_user.*, users.nama_lengkap as nama_lengkap, kelas.nama as nama_kelas, mapel.nama as nama_mapel FROM kelas_mapel_user JOIN users JOIN kelas JOIN mapel WHERE users.id = ? AND users.level = ? AND kelas_mapel_user.user_id = users.id AND kelas_mapel_user.kelas_id = kelas.id AND kelas_mapel_user.mapel_id = mapel.id ORDER BY users.id, kelas.id;", (user_id, level,))
+		row = cursor.fetchall();
+		cursor.close()
+
+		return row
+
+	def getAllGuru(self, id=None):
+		if id is None:
+			return self.getAllByLevel(1)
+		else:
+			return self.getAllByUserLevel(id, 1)
+
+	def getAllSiswa(self, id=None):
+		if id is None:
+			return self.getAllByLevel(2)
+		else:
+			return self.getAllByUserLevel(id, 2)
