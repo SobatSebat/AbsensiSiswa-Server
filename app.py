@@ -257,6 +257,28 @@ def _get_kmu_all_siswa_by_user_id(token, user_id):
 
 	return json.dumps({"success": True, "data": kelas_mapel_user.getAllByUserLevel(user_id, 2)})
 
+@app.route("/api/<token>/absen/guru/<user_id>/<kelas_id>/<mapel_id>", methods=["GET"])
+def _get_absen_guru(token, user_id, kelas_id, mapel_id):
+	user_id = int(user_id)
+	kelas_id = int(kelas_id)
+	mapel_id = int(mapel_id)
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": absen.getAbsen(1, user_id, kelas_id, mapel_id)})
+
+@app.route("/api/<token>/absen/siswa/<user_id>/<kelas_id>/<mapel_id>", methods=["GET"])
+def _get_absen_siswa(token, user_id, kelas_id, mapel_id):
+	user_id = int(user_id)
+	kelas_id = int(kelas_id)
+	mapel_id = int(mapel_id)
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": absen.getAbsen(2, user_id, kelas_id, mapel_id)})
+
 # create
 
 @app.route("/api/<token>/create/guru", methods=["POST"])
@@ -375,7 +397,7 @@ def _create_absen(token):
 	if not id:
 		return json.dumps({"success": False})
 
-	if users.getLevel(id) != 0:
+	if not (users.getLevel(id) in [0, 1]):
 		return json.dumps({"success": False})
 
 	kmu_id = Request.form.get("kmu_id", 0, int)

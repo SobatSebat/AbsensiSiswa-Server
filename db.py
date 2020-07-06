@@ -273,13 +273,20 @@ class AbsenTable(Table):
 		try:
 			cursor = self.db.cursor()
 			cursor.execute("BEGIN TRANSACTION;")
-			cursor.execute("INSERT INTO {} (kelas_mapel_user_id, waktu_masuk) VALUES(?, ?);".format(self.table_name), (kelas_mapel_user_id, waktu_masuk))
+			cursor.execute("INSERT INTO {} (kelas_mapel_user_id, waktu_hadir) VALUES(?, ?);".format(self.table_name), (kelas_mapel_user_id, waktu_masuk))
 			cursor.execute("END TRANSACTION;")
 			self.db.sql.commit()
 			cursor.close()
 			return True
 		except Exception as e:
 			return False
+
+	def getAbsen(self, level, user_id, kelas_id, mapel_id):
+		cursor = self.db.cursor()
+		cursor.execute('SELECT absen.id as id, absen.kelas_mapel_user_id as kmu_id, kelas_mapel_user.user_id as user_id, kelas_mapel_user.kelas_id as kelas_id, kelas_mapel_user.mapel_id as mapel_id, users.nama_lengkap as nama_lengkap, kelas.nama as nama_kelas, mapel.nama as nama_mapel, users.level as level, absen.waktu_hadir as waktu_hadir, strftime("%H", datetime(absen.waktu_hadir, "unixepoch", "localtime")) as jam, strftime("%d", datetime(absen.waktu_hadir, "unixepoch", "localtime")) as tanggal, strftime("%m", datetime(absen.waktu_hadir, "unixepoch", "localtime")) as bulan, strftime("%Y", datetime(absen.waktu_hadir, "unixepoch", "localtime")) as tahun FROM absen JOIN kelas_mapel_user JOIN users JOIN kelas JOIN mapel WHERE absen.kelas_mapel_user_id = kelas_mapel_user.id AND kelas_mapel_user.user_id = users.id AND kelas_mapel_user.kelas_id = kelas.id AND kelas_mapel_user.mapel_id = mapel.id AND users.level = ? AND kelas.id = ? AND mapel.id = ? AND users.id = ? GROUP BY absen.id;', (level, kelas_id, mapel_id, user_id))
+		ret = cursor.fetchall()
+		cursor.close()
+		return ret
 
 class Kelas_Mapel_UserTable(Table):
 	def getMapelByKelas(self, kelas_id):
@@ -305,14 +312,14 @@ class Kelas_Mapel_UserTable(Table):
 
 	def getUserByKelasMapel(self, kelas_id, mapel_id):
 		cursor = self.db.cursor()
-		cursor.execute("SELECT {tn}.id as id, {tn}.user_id as user_id, users.nama_lengkap as nama_lengkap, users.level as level FROM {tn} JOIN users JOIN kelas JOIN mapel WHERE {tn}.kelas_id = ? AND {tn}.mapel_id = ? AND users.id = {tn}.user_id AND kelas.id = {tn}.kelas_id AND mapel.id = {tn}.mapel_id GROUP BY {tn}.user_id;".format(tn=self.table_name), (kelas_id, mapel_id))
+		cursor.execute('SELECT {tn}.id as id, {tn}.user_id as user_id, users.nama_lengkap as nama_lengkap, users.level as level FROM {tn} JOIN users JOIN kelas JOIN mapel WHERE {tn}.kelas_id = ? AND {tn}.mapel_id = ? AND users.id = {tn}.user_id AND kelas.id = {tn}.kelas_id AND mapel.id = {tn}.mapel_id AND NOT EXISTS(SELECT absen.* FROM absen JOIN kelas_mapel_user as kmu JOIN users as u JOIN (SELECT *, strftime("%H:00 %d %m %Y", datetime(waktu_hadir, "unixepoch", "localtime")) as waktu FROM absen) as a where a.waktu_hadir = absen.waktu_hadir AND a.waktu == strftime("%H:00 %d %m %Y", datetime("now", "localtime")) AND absen.kelas_mapel_user_id = kmu.id AND kmu.user_id = u.id AND u.id = users.id GROUP BY absen.id) GROUP BY {tn}.user_id;'.format(tn=self.table_name), (kelas_id, mapel_id))
 		ret = cursor.fetchall()
 		cursor.close()
 		return ret
 
 	def getUserByKelasMapelLevel(self, kelas_id, mapel_id, level):
 		cursor = self.db.cursor()
-		cursor.execute("SELECT {tn}.id as id, {tn}.user_id as user_id, users.nama_lengkap as nama_lengkap, users.level as level FROM {tn} JOIN users JOIN kelas JOIN mapel WHERE {tn}.kelas_id = ? AND {tn}.mapel_id = ? AND users.level = ? AND users.id = {tn}.user_id AND kelas.id = {tn}.kelas_id AND mapel.id = {tn}.mapel_id GROUP BY {tn}.user_id;".format(tn=self.table_name), (kelas_id, mapel_id, level))
+		cursor.execute('SELECT {tn}.id as id, {tn}.user_id as user_id, users.nama_lengkap as nama_lengkap, users.level as level FROM {tn} JOIN users JOIN kelas JOIN mapel WHERE {tn}.kelas_id = ? AND {tn}.mapel_id = ? AND users.level = ? AND users.id = {tn}.user_id AND kelas.id = {tn}.kelas_id AND mapel.id = {tn}.mapel_id AND NOT EXISTS(SELECT absen.* FROM absen JOIN kelas_mapel_user as kmu JOIN users as u JOIN (SELECT *, strftime("%H:00 %d %m %Y", datetime(waktu_hadir, "unixepoch", "localtime")) as waktu FROM absen) as a where a.waktu_hadir = absen.waktu_hadir AND a.waktu == strftime("%H:00 %d %m %Y", datetime("now", "localtime")) AND absen.kelas_mapel_user_id = kmu.id AND kmu.user_id = u.id AND u.id = users.id GROUP BY absen.id) GROUP BY {tn}.user_id;'.format(tn=self.table_name), (kelas_id, mapel_id, level))
 		ret = cursor.fetchall()
 		cursor.close()
 		return ret
