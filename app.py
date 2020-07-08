@@ -257,6 +257,36 @@ def _get_kmu_all_siswa_by_user_id(token, user_id):
 
 	return json.dumps({"success": True, "data": kelas_mapel_user.getAllByUserLevel(user_id, 2)})
 
+@app.route("/api/<token>/absen/get/guru_siswa/<kelas_id>/<mapel_id>", methods=["GET"])
+def _get_absen_get_guru_siswa(token, kelas_id, mapel_id):
+	kelas_id = int(kelas_id)
+	mapel_id = int(mapel_id)
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": absen.getUserByKelasMapel(kelas_id, mapel_id)})
+
+@app.route("/api/<token>/absen/get/guru/<kelas_id>/<mapel_id>", methods=["GET"])
+def _get_absen_get_guru(token, kelas_id, mapel_id):
+	kelas_id = int(kelas_id)
+	mapel_id = int(mapel_id)
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": absen.getUserByKelasMapelLevel(kelas_id, mapel_id, 1)})
+
+@app.route("/api/<token>/absen/get/siswa/<kelas_id>/<mapel_id>", methods=["GET"])
+def _get_absen_get_siswa(token, kelas_id, mapel_id):
+	kelas_id = int(kelas_id)
+	mapel_id = int(mapel_id)
+	xid = session.GetId(token)
+	if not xid:
+		return json.dumps({"success": False})
+
+	return json.dumps({"success": True, "data": absen.getUserByKelasMapelLevel(kelas_id, mapel_id, 2)})
+
 @app.route("/api/<token>/absen/guru/<user_id>/<kelas_id>/<mapel_id>", methods=["GET"])
 def _get_absen_guru(token, user_id, kelas_id, mapel_id):
 	user_id = int(user_id)
