@@ -340,14 +340,14 @@ class Kelas_Mapel_UserTable(Table):
 
 	def getUserByBukanKelasMapel(self, kelas_id, mapel_id):
 		cursor = self.db.cursor()
-		cursor.execute("SELECT users.* FROM users WHERE ( users.level = 1 OR users.level = 2 ) AND NOT EXISTS( SELECT * FROM kelas_mapel_user WHERE kelas_mapel_user.user_id = users.id AND kelas_mapel_user.kelas_id = ? AND kelas_mapel_user.mapel_id = ? ) GROUP BY users.id;", (kelas_id, mapel_id))
+		cursor.execute("SELECT users.* FROM users WHERE ( users.level = 1 OR users.level = 2 ) AND NOT EXISTS( SELECT * FROM kelas_mapel_user WHERE kelas_mapel_user.user_id = users.id AND kelas_mapel_user.kelas_id = ? AND kelas_mapel_user.mapel_id = ? ) AND NOT EXISTS( SELECT * FROM kelas_mapel_user WHERE kelas_mapel_user.user_id = users.id AND users.level = 2 AND kelas_mapel_user.kelas_id != ?) GROUP BY users.id;", (kelas_id, mapel_id, kelas_id))
 		ret = cursor.fetchall()
 		cursor.close()
 		return ret
 
 	def getUserByBukanKelasMapelLevel(self, kelas_id, mapel_id, level):
 		cursor = self.db.cursor()
-		cursor.execute("SELECT users.* FROM users WHERE users.level = ? AND NOT EXISTS( SELECT * FROM kelas_mapel_user WHERE kelas_mapel_user.user_id = users.id AND kelas_mapel_user.kelas_id = ? AND kelas_mapel_user.mapel_id = ? ) GROUP BY users.id;", (level, kelas_id, mapel_id))
+		cursor.execute("SELECT users.* FROM users WHERE users.level = ? AND NOT EXISTS( SELECT * FROM kelas_mapel_user WHERE kelas_mapel_user.user_id = users.id AND kelas_mapel_user.kelas_id = ? AND kelas_mapel_user.mapel_id = ? )  AND NOT EXISTS( SELECT * FROM kelas_mapel_user WHERE kelas_mapel_user.user_id = users.id AND users.level = 2 AND kelas_mapel_user.kelas_id != ?) GROUP BY users.id;", (level, kelas_id, mapel_id, kelas_id))
 		ret = cursor.fetchall()
 		cursor.close()
 		return ret
